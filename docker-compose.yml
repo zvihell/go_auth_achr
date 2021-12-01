@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    command: ./go_auth
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - .env
+
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+    - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abc123}
+      POSTGRES_DB: auth_go
+    ports:
+      - 5436:5432
+
+services:
+ frontend:
+    build:
+      context: ./frontend
+    image: goauth_prod_frontend
+    ports:
+      - 3000:3000
+    depends_on: 
+      - backend
+
